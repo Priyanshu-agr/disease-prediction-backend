@@ -3,31 +3,35 @@ import pickle
 # import sklearn
 
 def predict_disease(config):
-    df=pd.read_csv('../Final_Train_data.csv')
-    df.drop(axis=1,columns=['Unnamed: 0','fluid_overload'],inplace=True)
+    df=pd.read_csv('../Final_Train_Data.csv')
 
-    pkl_filename1="../Project_model.pkl"
+    pkl_filename1="../model.pkl"
     pkl_filename2="../encoder.pkl"
 
     with open(pkl_filename1,'rb') as f_in:
         model=pickle.load(f_in)
 
     with open(pkl_filename2,'rb') as e_in:
-        encoder=pickle.load(e_in) 
+        encoder=pickle.load(e_in)            
+
+    all_symptoms = [col for col in df.drop(['prognosis','Unnamed: 0','Unnamed: 145','\xa0'], axis=1).columns]
+    new_names=[]
+    for name in all_symptoms:
+        name=name.replace('\xa0',' ')
+        new_names.append(name)
+
+    all_symptoms=new_names
+
+    inp = {col : 0 for col in all_symptoms }
+
+    for dis in config:
+        inp.update({dis : 1})
+
+    inp = pd.DataFrame(inp , index=[0])
+    ans = encoder.inverse_transform(model.predict(inp))[0]
+
+    return ans
     
-    for symptoms in config:
-        df.update({symptoms:1})    
-
-    inp = {i:0 for i in df.drop('prognosis',axis=1).columns}
-
-    # for symptoms in config:
-    #     inp.update({symptoms:1})
-
-    inp=pd.DataFrame(inp,index=[0])
-    # ans=encoder.inverse_transform(model.predict(inp))
-    # return ans
-    return 'ans received'
-
 def similar(dis):
     data=pd.read_csv('../data_for_sim_dos.csv')
     similarity=pd.read_csv('../similarity.csv')

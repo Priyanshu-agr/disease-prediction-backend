@@ -18,4 +18,12 @@ def create_item(input:Input):
         return result
     except Exception as e:
         return ({'error':str(e)}),500
+    
+@app.post('/similar_disease')
+def predict_similar(input:Input):
+    try:
+        result=predict_disease(input.disease[0])
+        return result
+    except Exception as e:
+        return ({'error':str(e)}),500
 
